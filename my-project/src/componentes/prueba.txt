@@ -1,0 +1,49 @@
+import { useContext, useState, useEffect } from "react";
+import { Context } from "../context/Context";
+import { ListaProducto } from "./ListaProducto";
+import { useParams } from "react-router-dom";
+
+export const ProductoContenedor = () => {
+  const [items, setItems] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const { id } = useParams();
+  const { productos } = useContext(Context);// trae productos desde el Storage 
+
+  useEffect(() => {
+    
+
+    const filteredItems = productos.filter((item) =>
+      item.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const promesa = new Promise((res) => {
+      setTimeout(() => {
+        
+        res(id ? filteredItems.filter((item) => item.category === id) : filteredItems);// filtro por categoria 
+      }, 800);
+    });
+
+    promesa.then((res) => {
+     
+      setItems(res);
+    });
+  }, [id, searchTerm, productos]);
+
+  return (
+    <div className="container mx-auto">
+      <div className="">
+      <div className="bg-black h-12 my-4">
+      <label className=" text-white text-2xl mx-2 my-1">Buscar</label> 
+        <input className=" border-2 rounded-md border-black"
+          type="text"
+          placeholder="Buscar por nombre..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        </div>
+        <ListaProducto items={items} />
+      </div>
+    </div>
+  );
+};
+
